@@ -29,7 +29,7 @@ func (s *SplitMix64Source) Int63() int64 {
 	return int64(s.Uint64() & MaxUint63)
 }
 
-// Uint64 implements the rand.Source interface.
+// Uint64 implements the rand.Source64 interface.
 func (s *SplitMix64Source) Uint64() uint64 {
 	*s += 0x9E3779B97F4A7C15
 	z := *s
@@ -55,7 +55,7 @@ func (s *XOshiro256Source) Int63() int64 {
 	return int64(s.Uint64() & MaxUint63)
 }
 
-// Uint64 implements the rand.Source interface.
+// Uint64 implements the rand.Source64 interface.
 func (s *XOshiro256Source) Uint64() uint64 {
 	z := bits.RotateLeft64(s[1]*5, 7) * 9
 	t := s[1] << 17
@@ -129,7 +129,7 @@ func (s *PCGSource) Int63() int64 {
 	return int64(s.Uint64() & MaxUint63)
 }
 
-// Uint64 implements the rand.Source interface.
+// Uint64 implements the rand.Source64 interface.
 func (s *PCGSource) Uint64() uint64 {
 	s.mult()
 	s.add()
@@ -175,7 +175,7 @@ func (s *LockableSource) Int63() int64 {
 	return z
 }
 
-// Uint64 implements the rand.Source interface.
+// Uint64 implements the rand.Source64 interface.
 func (s *LockableSource) Uint64() uint64 {
 	s.lk.Lock()
 	z := s.src.Uint64()
