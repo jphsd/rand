@@ -1,7 +1,7 @@
 /*
 Package rand contains additional math/rand/Source64 implementations for use with math/rand's Rand type.
 
-The standard math/rand Source64 uses an Additive Lagged Fibonacci Generator (ALFG) orignally designed by
+The standard math/rand Source64 uses an Additive Lagged Fibonacci Generator (ALFG) originally designed by
 DP Mitchell and JA Reeds for Bell Lab's Plan9 operating system.
 
 SplitMix64 (period 2^64)
