@@ -1,8 +1,9 @@
 /*
 Package rand contains additional math/rand/Source64 implementations for use with math/rand's Rand type.
 
-The standard math/rand Source64 uses an Additive Lagged Fibonacci Generator (ALFG) originally designed by
-DP Mitchell and JA Reeds for Bell Lab's Plan9 operating system.
+The standard math/rand Source64 pre v1.17 used an Additive Lagged Fibonacci Generator (ALFG) originally designed by
+DP Mitchell and JA Reeds for Bell Lab's Plan9 operating system. From 1.17 it uses the wyrand (runtime.fastrand) PRNG
+https://github.com/wangyi-fudan/wyhash
 
 SplitMix64 (period 2^64)
   A fixed-increment version of Java 8's SplittableRandom generator

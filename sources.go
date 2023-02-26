@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	// MaxUint63 represents the largest value tht can be held in a 63 bit unsigned integer.
+	// MaxUint63 represents the largest value that can be held in a 63 bit unsigned integer.
 	MaxUint63 = (1 << 63) - 1
 
 	mulHi = 0x2360ed051fc65da4
@@ -31,10 +31,10 @@ func (s *SplitMix64Source) Int63() int64 {
 
 // Uint64 implements the rand.Source64 interface.
 func (s *SplitMix64Source) Uint64() uint64 {
-	*s += 0x9E3779B97F4A7C15
+	*s += 0x9e3779b97f4a7c15
 	z := *s
-	z = (z ^ (z >> 30)) * 0xBF58476D1CE4E5B9
-	z = (z ^ (z >> 27)) * 0x94D049BB133111EB
+	z = (z ^ (z >> 30)) * 0xbf58476d1ce4e5B9
+	z = (z ^ (z >> 27)) * 0x94d049bb133111eB
 	z = z ^ (z >> 31)
 	return uint64(z)
 }
@@ -147,6 +147,37 @@ func (s *PCGSource) mult() {
 	hi += s[1] * mulLo
 	hi += s[0] * mulHi
 	s[0], s[1] = lo, hi
+}
+
+// wyrand (runtime.fastrand)
+
+const (
+	wy0 WySource = 0xa0761d6478bd642f
+	wy1 WySource = 0xe7037ed1a0b428db
+)
+
+// WySource (from https://github.com/wangyi-fudan/wyhash)
+type WySource uint64
+
+// Seed implements the rand.Source interface.
+func (s WySource) Seed(seed int64) {
+	s = WySource(seed)
+}
+
+// Int63 implements the rand.Source interface.
+func (s WySource) Int63() int64 {
+	return int64(s.Uint64())
+}
+
+// Uint64 implements the rand.Source64 interface.
+func (s WySource) Uint64() uint64 {
+	s += wy0
+	return wymulf(s^wy1, s)
+}
+
+func wymulf(a, b WySource) uint64 {
+	hi, lo := bits.Mul64(uint64(a), uint64(b))
+	return hi ^ lo
 }
 
 // LockableSource wraps a type implementing rand.Source64 in a mutex to make it goroutine safe.
