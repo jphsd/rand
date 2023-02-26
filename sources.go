@@ -20,19 +20,19 @@ const (
 type SplitMix64Source uint64
 
 // Seed implements the rand.Source interface.
-func (s SplitMix64Source) Seed(seed int64) {
-	s = SplitMix64Source(seed)
+func (s *SplitMix64Source) Seed(seed int64) {
+	*s = SplitMix64Source(seed)
 }
 
 // Int63 implements the rand.Source interface.
-func (s SplitMix64Source) Int63() int64 {
+func (s *SplitMix64Source) Int63() int64 {
 	return int64(s.Uint64() & MaxUint63)
 }
 
 // Uint64 implements the rand.Source64 interface.
-func (s SplitMix64Source) Uint64() uint64 {
-	s += 0x9e3779b97f4a7c15
-	z := s
+func (s *SplitMix64Source) Uint64() uint64 {
+	*s += 0x9e3779b97f4a7c15
+	z := *s
 	z = (z ^ (z >> 30)) * 0xbf58476d1ce4e5B9
 	z = (z ^ (z >> 27)) * 0x94d049bb133111eB
 	z = z ^ (z >> 31)
@@ -44,19 +44,19 @@ func (s SplitMix64Source) Uint64() uint64 {
 type XOshiro256Source [4]uint64
 
 // Seed implements the rand.Source interface.
-func (s XOshiro256Source) Seed(seed int64) {
+func (s *XOshiro256Source) Seed(seed int64) {
 	var sm64 SplitMix64Source
 	sm64.Seed(seed)
 	s[0], s[1], s[2], s[3] = sm64.Uint64(), sm64.Uint64(), sm64.Uint64(), sm64.Uint64()
 }
 
 // Int63 implements the rand.Source interface.
-func (s XOshiro256Source) Int63() int64 {
+func (s *XOshiro256Source) Int63() int64 {
 	return int64(s.Uint64() & MaxUint63)
 }
 
 // Uint64 implements the rand.Source64 interface.
-func (s XOshiro256Source) Uint64() uint64 {
+func (s *XOshiro256Source) Uint64() uint64 {
 	z := bits.RotateLeft64(s[1]*5, 7) * 9
 	t := s[1] << 17
 
@@ -73,7 +73,7 @@ func (s XOshiro256Source) Uint64() uint64 {
 
 // Jump is equivalent to 2^128 calls to Uint64(); it can be used to generate 2^128
 // non-overlapping subsequences for parallel computations.
-func (s XOshiro256Source) Jump() XOshiro256Source {
+func (s *XOshiro256Source) Jump() *XOshiro256Source {
 	jbits := [4]uint64{0x180ec6d33cfd0aba, 0xd5a61266f0c9392c, 0xa9582618e03fc9aa, 0x39abdc4529b1661c}
 
 	var s0, s1, s2, s3 uint64
@@ -89,13 +89,13 @@ func (s XOshiro256Source) Jump() XOshiro256Source {
 		}
 	}
 
-	return XOshiro256Source{s0, s1, s2, s3}
+	return &XOshiro256Source{s0, s1, s2, s3}
 }
 
 // LongJump is equivalent to 2^192 calls to Uint64(); it can be used to generate 2^64 starting points,
 // from each of which jump() will generate 2^64 non-overlapping subsequences for parallel distributed
 // computations.
-func (s XOshiro256Source) LongJump() XOshiro256Source {
+func (s *XOshiro256Source) LongJump() *XOshiro256Source {
 	jbits := [4]uint64{0x76e15d3efefdcbbf, 0xc5004e441c522fb3, 0x77710069854ee241, 0x39109bb02acbe635}
 
 	var s0, s1, s2, s3 uint64
@@ -111,38 +111,38 @@ func (s XOshiro256Source) LongJump() XOshiro256Source {
 		}
 	}
 
-	return XOshiro256Source{s0, s1, s2, s3}
+	return &XOshiro256Source{s0, s1, s2, s3}
 }
 
 // PCGSource - size 128 bits, period 2^128.
 type PCGSource [2]uint64
 
 // Seed implements the rand.Source interface.
-func (s PCGSource) Seed(seed int64) {
+func (s *PCGSource) Seed(seed int64) {
 	var sm64 SplitMix64Source
 	sm64.Seed(seed)
 	s[0], s[1] = sm64.Uint64(), sm64.Uint64()
 }
 
 // Int63 implements the rand.Source interface.
-func (s PCGSource) Int63() int64 {
+func (s *PCGSource) Int63() int64 {
 	return int64(s.Uint64() & MaxUint63)
 }
 
 // Uint64 implements the rand.Source64 interface.
-func (s PCGSource) Uint64() uint64 {
+func (s *PCGSource) Uint64() uint64 {
 	s.mult()
 	s.add()
 	return bits.RotateLeft64(s[0]^s[1], -int(s[1]>>58))
 }
 
-func (s PCGSource) add() {
+func (s *PCGSource) add() {
 	var c uint64
 	s[0], c = bits.Add64(s[0], incLo, 0)
 	s[1], _ = bits.Add64(s[1], incHi, c)
 }
 
-func (s PCGSource) mult() {
+func (s *PCGSource) mult() {
 	hi, lo := bits.Mul64(s[0], mulLo)
 	hi += s[1] * mulLo
 	hi += s[0] * mulHi
@@ -160,19 +160,19 @@ const (
 type WySource uint64
 
 // Seed implements the rand.Source interface.
-func (s WySource) Seed(seed int64) {
-	s = WySource(seed)
+func (s *WySource) Seed(seed int64) {
+	*s = WySource(seed)
 }
 
 // Int63 implements the rand.Source interface.
-func (s WySource) Int63() int64 {
+func (s *WySource) Int63() int64 {
 	return int64(s.Uint64())
 }
 
 // Uint64 implements the rand.Source64 interface.
-func (s WySource) Uint64() uint64 {
-	s += wy0
-	return wymulf(s^wy1, s)
+func (s *WySource) Uint64() uint64 {
+	*s += wy0
+	return wymulf(*s^wy1, *s)
 }
 
 func wymulf(a, b WySource) uint64 {
