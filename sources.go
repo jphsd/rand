@@ -166,7 +166,7 @@ func (s *WySource) Seed(seed int64) {
 
 // Int63 implements the rand.Source interface.
 func (s *WySource) Int63() int64 {
-	return int64(s.Uint64())
+	return int64(s.Uint64() & MaxUint63)
 }
 
 // Uint64 implements the rand.Source64 interface.
